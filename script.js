@@ -80,17 +80,39 @@ if (nav) {
   }, { passive: true });
 }
 
-/* Form submission (Google Forms redirect or WhatsApp) */
+/* Form submission — opens WhatsApp to ScribeGulf (+1-236-869-6643) */
+const SCRIBEGULF_WHATSAPP_DIGITS = '12368696643';
 const form = document.querySelector('#brief-form');
 if (form) {
   form.addEventListener('submit', e => {
     e.preventDefault();
-    const name = form.querySelector('[name="name"]')?.value || '';
-    const subj = form.querySelector('[name="subject"]')?.value || '';
-    const type = form.querySelector('[name="type"]')?.value || '';
-    const wc   = form.querySelector('[name="wordcount"]')?.value || '';
-    const dl   = form.querySelector('[name="deadline"]')?.value || '';
-    const msg  = `Hi ScribeGulf, my name is ${name}. I need help with a ${type} on ${subj} (${wc} words), due ${dl}.`;
-    window.open(`https://wa.me/971000000000?text=${encodeURIComponent(msg)}`, '_blank');
+    const name = form.querySelector('[name="name"]')?.value?.trim() || '';
+    const wa = form.querySelector('[name="whatsapp"]')?.value?.trim() || '';
+    const uni = form.querySelector('[name="university"]')?.value?.trim() || '';
+    const subj = form.querySelector('[name="subject"]')?.value?.trim() || '';
+    const type = form.querySelector('[name="type"]')?.value?.trim() || '';
+    const wc = form.querySelector('[name="wordcount"]')?.value?.trim() || '';
+    const dl = form.querySelector('[name="deadline"]')?.value?.trim() || '';
+    const brief = form.querySelector('[name="brief"]')?.value?.trim() || '';
+    const extra = form.querySelector('[name="extra"]')?.value?.trim() || '';
+    const parts = [
+      'Hi ScribeGulf — new brief via the website form.',
+      '',
+      `Name: ${name}`,
+      `My WhatsApp: ${wa}`,
+      `University / programme: ${uni}`,
+      `Subject: ${subj}`,
+      `Assignment type: ${type}`,
+      `Word count or pages: ${wc}`,
+      `Deadline: ${dl}`,
+      '',
+      'Brief and rubric:',
+      brief,
+    ];
+    if (extra) {
+      parts.push('', 'Anything else:', extra);
+    }
+    const msg = parts.join('\n');
+    window.open(`https://wa.me/${SCRIBEGULF_WHATSAPP_DIGITS}?text=${encodeURIComponent(msg)}`, '_blank');
   });
 }
