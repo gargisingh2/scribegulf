@@ -1,0 +1,14 @@
+# Working documents (not part of the site)
+*.docx
+~$*
+
+# Local working folders
+Brand assets/
+.claude/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+*.swp
