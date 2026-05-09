@@ -5,13 +5,16 @@ const hamburger = document.querySelector('.nav__hamburger');
 const mobileNav = document.querySelector('.nav__mobile');
 if (hamburger && mobileNav) {
   hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('open');
-    mobileNav.classList.toggle('open');
+    const open = !mobileNav.classList.contains('open');
+    hamburger.classList.toggle('open', open);
+    mobileNav.classList.toggle('open', open);
+    hamburger.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
   document.querySelectorAll('.nav__mobile .nav__link').forEach(l => {
     l.addEventListener('click', () => {
       hamburger.classList.remove('open');
       mobileNav.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
     });
   });
 }
