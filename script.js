@@ -80,13 +80,12 @@ if (nav) {
   }, { passive: true });
 }
 
-/* Form submission — logs to Google Sheet via Apps Script, then opens WhatsApp */
-const SCRIBEGULF_WHATSAPP_DIGITS = '12368696643';
+/* Form submission — logs to Google Sheet via Apps Script and notifies by email */
 const FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxYBVCHBh0lWcjZYGNRy73Sca7k4t4x_t0A1c8WKjDPI3fOu4IWdv4vkakK6j469Zt0mw/exec';
 
 const form = document.querySelector('#brief-form');
 if (form) {
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
 
     // Honeypot — bots fill this hidden field; humans don't
@@ -99,48 +98,38 @@ if (form) {
       return;
     }
 
-    const val = n => form.querySelector(`[name="${n}"]`)?.value?.trim() || '';
-    const name = val('name');
-    const wa = val('whatsapp');
-    const uni = val('university');
-    const subj = val('subject');
-    const type = val('type');
-    const wc = val('wordcount');
-    const dl = val('deadline');
-    const brief = val('brief');
-    const extra = val('extra');
-
-    // Send to Google Sheet via Apps Script (fire-and-forget, keepalive so it
-    // survives the WhatsApp tab opening)
-    const payload = new URLSearchParams({
-      name, whatsapp: wa, university: uni, subject: subj, type,
-      wordcount: wc, deadline: dl, brief, extra,
-      ua: navigator.userAgent, ref: document.referrer
-    });
-    try {
-      fetch(FORM_ENDPOINT, { method: 'POST', body: payload, keepalive: true });
-    } catch (_) {
-      // Network failure — WhatsApp flow still gives Gargi the lead, so swallow silently
+    const submitBtn = form.querySelector('.form__submit');
+    const originalBtnHTML = submitBtn ? submitBtn.innerHTML : '';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending…';
     }
 
-    // Build WhatsApp message and open it (must be sync to dodge popup blockers)
-    const parts = [
-      'Hi ScribeGulf — new brief via the website form.',
-      '',
-      `Name: ${name}`,
-      `My WhatsApp: ${wa}`,
-      `University / programme: ${uni}`,
-      `Subject: ${subj}`,
-      `Assignment type: ${type}`,
-      `Word count or pages: ${wc}`,
-      `Deadline: ${dl}`,
-      '',
-      'Brief and rubric:',
-      brief,
-    ];
-    if (extra) parts.push('', 'Anything else:', extra);
-    const msg = parts.join('\n');
-    window.open(`https://wa.me/${SCRIBEGULF_WHATSAPP_DIGITS}?text=${encodeURIComponent(msg)}`, '_blank');
+    const val = n => form.querySelector(`[name="${n}"]`)?.value?.trim() || '';
+    const payload = new URLSearchParams({
+      name: val('name'),
+      whatsapp: val('whatsapp'),
+      university: val('university'),
+      subject: val('subject'),
+      type: val('type'),
+      wordcount: val('wordcount'),
+      deadline: val('deadline'),
+      brief: val('brief'),
+      extra: val('extra'),
+      ua: navigator.userAgent,
+      ref: document.referrer
+    });
+
+    try {
+      await fetch(FORM_ENDPOINT, { method: 'POST', body: payload });
+    } catch (err) {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHTML;
+      }
+      alert("Sorry — we couldn't submit your brief right now. Please try again, or message us on WhatsApp at +1-236-869-6643.");
+      return;
+    }
 
     // In-page confirmation
     const success = document.createElement('div');
@@ -148,8 +137,8 @@ if (form) {
     success.setAttribute('role', 'status');
     success.innerHTML =
       '<strong>Thanks — your brief has been received.</strong>' +
-      '<p>WhatsApp has opened in a new tab so you can send the message directly. ' +
-      "We'll confirm fit and pricing within a few hours during working hours.</p>";
+      "<p>We'll review it and reply with fit and pricing within a few hours during working hours " +
+      '(Sunday–Thursday, 9 am–8 pm UAE time). Outside those hours we reply the next morning.</p>';
     form.parentNode.insertBefore(success, form);
     form.style.display = 'none';
     success.scrollIntoView({ behavior: 'smooth', block: 'center' });
