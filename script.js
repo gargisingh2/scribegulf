@@ -80,21 +80,50 @@ if (nav) {
   }, { passive: true });
 }
 
-/* Form submission — opens WhatsApp to ScribeGulf (+1-236-869-6643) */
+/* Form submission — logs to Google Sheet via Apps Script, then opens WhatsApp */
 const SCRIBEGULF_WHATSAPP_DIGITS = '12368696643';
+const FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxYBVCHBh0lWcjZYGNRy73Sca7k4t4x_t0A1c8WKjDPI3fOu4IWdv4vkakK6j469Zt0mw/exec';
+
 const form = document.querySelector('#brief-form');
 if (form) {
   form.addEventListener('submit', e => {
     e.preventDefault();
-    const name = form.querySelector('[name="name"]')?.value?.trim() || '';
-    const wa = form.querySelector('[name="whatsapp"]')?.value?.trim() || '';
-    const uni = form.querySelector('[name="university"]')?.value?.trim() || '';
-    const subj = form.querySelector('[name="subject"]')?.value?.trim() || '';
-    const type = form.querySelector('[name="type"]')?.value?.trim() || '';
-    const wc = form.querySelector('[name="wordcount"]')?.value?.trim() || '';
-    const dl = form.querySelector('[name="deadline"]')?.value?.trim() || '';
-    const brief = form.querySelector('[name="brief"]')?.value?.trim() || '';
-    const extra = form.querySelector('[name="extra"]')?.value?.trim() || '';
+
+    // Honeypot — bots fill this hidden field; humans don't
+    const honey = form.querySelector('[name="website"]');
+    if (honey && honey.value) return;
+
+    // Basic native validation (we set novalidate, so check manually)
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const val = n => form.querySelector(`[name="${n}"]`)?.value?.trim() || '';
+    const name = val('name');
+    const wa = val('whatsapp');
+    const uni = val('university');
+    const subj = val('subject');
+    const type = val('type');
+    const wc = val('wordcount');
+    const dl = val('deadline');
+    const brief = val('brief');
+    const extra = val('extra');
+
+    // Send to Google Sheet via Apps Script (fire-and-forget, keepalive so it
+    // survives the WhatsApp tab opening)
+    const payload = new URLSearchParams({
+      name, whatsapp: wa, university: uni, subject: subj, type,
+      wordcount: wc, deadline: dl, brief, extra,
+      ua: navigator.userAgent, ref: document.referrer
+    });
+    try {
+      fetch(FORM_ENDPOINT, { method: 'POST', body: payload, keepalive: true });
+    } catch (_) {
+      // Network failure — WhatsApp flow still gives Gargi the lead, so swallow silently
+    }
+
+    // Build WhatsApp message and open it (must be sync to dodge popup blockers)
     const parts = [
       'Hi ScribeGulf — new brief via the website form.',
       '',
@@ -109,10 +138,20 @@ if (form) {
       'Brief and rubric:',
       brief,
     ];
-    if (extra) {
-      parts.push('', 'Anything else:', extra);
-    }
+    if (extra) parts.push('', 'Anything else:', extra);
     const msg = parts.join('\n');
     window.open(`https://wa.me/${SCRIBEGULF_WHATSAPP_DIGITS}?text=${encodeURIComponent(msg)}`, '_blank');
+
+    // In-page confirmation
+    const success = document.createElement('div');
+    success.className = 'form__success';
+    success.setAttribute('role', 'status');
+    success.innerHTML =
+      '<strong>Thanks — your brief has been received.</strong>' +
+      '<p>WhatsApp has opened in a new tab so you can send the message directly. ' +
+      "We'll confirm fit and pricing within a few hours during working hours.</p>";
+    form.parentNode.insertBefore(success, form);
+    form.style.display = 'none';
+    success.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 }

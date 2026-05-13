@@ -146,10 +146,16 @@
       </div>
 
       <div class="reveal d2">
-        <form id="brief-form">
+        <form id="brief-form" novalidate>
           <div class="brief-form__header">
             <h3>Share your brief</h3>
             <p>All fields marked with * are required for a quote. Submissions open WhatsApp to <strong>+1-236-869-6643</strong> with your details pre-filled.</p>
+          </div>
+
+          <!-- Honeypot: hidden field. Real users leave blank; bots fill it. -->
+          <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
+            <label for="f-website">Website (leave empty)</label>
+            <input type="text" id="f-website" name="website" tabindex="-1" autocomplete="off">
           </div>
 
           <div class="form__row">
