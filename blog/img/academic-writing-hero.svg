@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
+  <defs>
+    <linearGradient id="bg5" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1C3D2E"/>
+      <stop offset="100%" stop-color="#2d5843"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="400" fill="url(#bg5)"/>
+  <circle cx="670" cy="70" r="110" fill="rgba(201,168,76,0.07)"/>
+  <circle cx="130" cy="340" r="85" fill="rgba(74,124,89,0.1)"/>
+  <!-- Pen/quill icon -->
+  <g transform="translate(360,55)">
+    <path d="M40 0 L75 60 L40 80 L5 60 Z" fill="none" stroke="#C9A84C" stroke-width="2.5"/>
+    <line x1="40" y1="80" x2="40" y2="110" stroke="#C9A84C" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="40" cy="40" r="12" fill="none" stroke="#4A7C59" stroke-width="2"/>
+    <text x="40" y="46" font-family="Georgia, serif" font-size="16" font-weight="700" fill="#4A7C59" text-anchor="middle">A</text>
+  </g>
+  <text x="400" y="225" font-family="Georgia, serif" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">Academic Writing</text>
+  <text x="400" y="260" font-family="Georgia, serif" font-size="20" fill="#C9A84C" text-anchor="middle">in the UAE</text>
+  <text x="400" y="310" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.5)" text-anchor="middle" letter-spacing="2.5">WHAT YOUR LECTURERS WISH YOU ALREADY KNEW</text>
+  <line x1="300" y1="340" x2="500" y2="340" stroke="#C9A84C" stroke-width="1.5" opacity="0.4"/>
+  <text x="400" y="370" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.35)" text-anchor="middle" letter-spacing="2">SCRIBEGULF.COM</text>
+</svg>
