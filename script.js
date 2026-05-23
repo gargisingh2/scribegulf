@@ -127,7 +127,7 @@ if (form) {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalBtnHTML;
       }
-      alert("Sorry — we couldn't submit your brief right now. Please try again, or message us on WhatsApp at +971 55 312 9798.");
+      alert("Sorry — we couldn't submit your brief right now. Please try again, or message us on WhatsApp at +1-236-869-6643.");
       return;
     }
 
